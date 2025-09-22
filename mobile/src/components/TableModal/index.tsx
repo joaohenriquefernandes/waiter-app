@@ -15,6 +15,7 @@ export function TableModal({visible, onClose, onSave }: ITableModalProps) {
   const [table, setTable] = useState('0');
   const isAndroid = Platform.OS === 'android';
   function handleSave() {
+    setTable('');
     onSave(table);
     onClose();
   }
@@ -34,6 +35,7 @@ export function TableModal({visible, onClose, onSave }: ITableModalProps) {
           </Header>
           <Form>
             <Input
+              value={table}
               placeholder='Número da mesa'
               placeholderTextColor='#666666'
               keyboardType='number-pad'
