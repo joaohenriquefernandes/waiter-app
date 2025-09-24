@@ -8,10 +8,11 @@ import { useState } from 'react';
 import { IProduct } from '../../types/Product';
 
 interface IMenuProps {
+  products: IProduct[]
   onAddToCart: (product: IProduct) => void;
 }
 
-export function Menu({ onAddToCart }: IMenuProps) {
+export function Menu({ products, onAddToCart }: IMenuProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
 
