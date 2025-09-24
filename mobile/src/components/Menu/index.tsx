@@ -7,10 +7,13 @@ import { ProductModal } from '../ProductModal';
 import { useState } from 'react';
 import { IProduct } from '../../types/Product';
 
-export function Menu() {
+interface IMenuProps {
+  onAddToCart: (product: IProduct) => void;
+}
+
+export function Menu({ onAddToCart }: IMenuProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
-  const products: any[] = [];
 
   function handleOpenModal(product: IProduct) {
     setIsModalVisible(true);
@@ -22,6 +25,7 @@ export function Menu() {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         product={selectedProduct}
+        onAddToCart={onAddToCart}
       />
       <FlatList
         data={products}
@@ -49,7 +53,7 @@ export function Menu() {
                 {formatCurrency(item.price)}
                 </Text>
             </ProductDetails>
-            <AddToCartButton>
+            <AddToCartButton onPress={() => onAddToCart(item)}>
               <PlusCircle />
             </AddToCartButton>
           </ProductContainer>

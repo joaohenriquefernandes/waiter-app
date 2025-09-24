@@ -10,11 +10,17 @@ interface IProductModal {
   visible: boolean;
   product: IProduct | null;
   onClose: () => void;
+  onAddToCart: (product: IProduct) => void;
 }
 
-export function ProductModal({ visible, product, onClose }: IProductModal) {
+export function ProductModal({ visible, product, onClose, onAddToCart }: IProductModal) {
   if(!product) {
     return null;
+  }
+
+  function handleAddToCart() {
+    onAddToCart(product!);
+    onClose();
   }
 
   return (
@@ -62,7 +68,7 @@ export function ProductModal({ visible, product, onClose }: IProductModal) {
             <Text color='#666666'>Preço</Text>
             <Text size={20} weight='600'>{formatCurrency(product.price)}</Text>
           </PriceContainer>
-          <Button onPress={() => alert('ok')}>Adicionar ao pedido</Button>
+          <Button onPress={handleAddToCart}>Adicionar ao pedido</Button>
         </FooterContainer>
       </Footer>
     </Modal>
