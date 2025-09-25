@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { Categories } from '../components/Categories';
 import { Header } from '../components/Header';
@@ -11,13 +11,39 @@ import { Menu } from '../components/Menu';
 import { ActivityIndicator } from 'react-native';
 import { Empty } from '../components/Icons/Empty';
 import { Text } from '../components/Text';
+import { ICategory } from '../types/Category';
+import { api } from '../utils/api';
 
 export function Main() {
   const [isTableModalVisible, setIsTableModalVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState('');
   const [cartItems, setCartItems] = useState<ICartItem[]>([]);
-  const [isLoading] = useState(false);
-  const [products] = useState<IProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/categories'),
+      api.get('/products')
+    ]).then(([categories, products]) => {
+      setCategories(categories.data);
+      setProducts(products.data);
+      setIsLoading(false);
+    });
+  }, []);
+  console.log(categories);
+  console.log(products);
+  console.log('LP', isLoadingProducts);
+  console.log('L', isLoading);
+  async function handleSelectCategory(categoryId: string) {
+    const route = categoryId ? `/categories/${categoryId}/products` : '/products';
+    setIsLoadingProducts(true);
+    const {data} = await api.get(route);
+    setProducts(data);
+    setIsLoadingProducts(false);
+  }
 
   function handleSaveTable(table: string) {
     setSelectedTable(table);
@@ -68,25 +94,36 @@ export function Main() {
           selectedTable={selectedTable}
           onCancelOrder={handleResetOrder}
         />
-        {isLoading && (
+        {isLoading ? (
           <CenteredContainer>
             <ActivityIndicator color='#D73035' size='large' />
           </CenteredContainer>
-        )}
-        {!isLoading && (
+        ) : (
           <>
             <CategoriesContainer>
-              <Categories />
+              <Categories
+                categories={categories}
+                onSelectCategory={handleSelectCategory}
+              />
             </CategoriesContainer>
-            {products.length > 0 ? (
-              <MenuContainer>
-                <Menu onAddToCart={handleAddToCart} products={products}/>
-              </MenuContainer>
-            ) : (
+
+            {isLoadingProducts ? (
               <CenteredContainer>
-                <Empty />
-                <Text color='#666666' style={{ marginTop: 24 }}>Nenhum produto foi encontrado!</Text>
+                <ActivityIndicator color='#D73035' size='large' />
               </CenteredContainer>
+            ) : (
+              <>
+                {products.length > 0 ? (
+                  <MenuContainer>
+                    <Menu onAddToCart={handleAddToCart} products={products}/>
+                  </MenuContainer>
+                ) : (
+                  <CenteredContainer>
+                    <Empty />
+                    <Text color='#666666' style={{ marginTop: 24 }}>Nenhum produto foi encontrado!</Text>
+                  </CenteredContainer>
+                )}
+              </>
             )}
           </>
         )}
@@ -104,6 +141,7 @@ export function Main() {
           )}
           {selectedTable && (
             <Cart
+              selectedTable={selectedTable}
               cartItems={cartItems}
               onAdd={handleAddToCart}
               onDecrement={handleDecrementCartItem}

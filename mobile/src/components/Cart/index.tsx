@@ -9,23 +9,35 @@ import { Button } from '../Button';
 import { IProduct } from '../../types/Product';
 import { OrderConfirmedModal } from '../OrderConfirmedModal';
 import { useState } from 'react';
+import { api } from '../../utils/api';
 
 interface ICartProps {
   cartItems: ICartItem[];
+  selectedTable: string
   onAdd: (product: IProduct) => void;
   onDecrement: (product: IProduct) => void;
   onConfirmOrder: () => void;
 }
 
-export function Cart({ cartItems, onAdd, onDecrement, onConfirmOrder }: ICartProps) {
+export function Cart({ cartItems, selectedTable, onAdd, onDecrement, onConfirmOrder }: ICartProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const total = cartItems.reduce((acc, cartItem) => {
     return acc + cartItem.quantity * cartItem.product.price;
   }, 0);
 
-  function handleConfirmOrder() {
+  async function handleConfirmOrder() {
+    setIsLoading(true);
+    const payload = {
+      table: selectedTable,
+      products:cartItems.map((item) => ({
+        product: item.product._id,
+        quantity: item.quantity
+      }))
+    };
+    api.post('/orders', payload);
+    setIsLoading(false);
     setIsModalVisible(true);
   }
 
@@ -51,7 +63,7 @@ export function Cart({ cartItems, onAdd, onDecrement, onConfirmOrder }: ICartPro
               <ProductContainer>
                 <Image
                   source={{
-                    uri: `exp://192.168.0.115:3001/uploads/${item.product.imagePath}`
+                    uri: `http://192.168.0.115:3001/uploads/${item.product.imagePath}`
                   }}
                 />
                 <QuantityContainer>

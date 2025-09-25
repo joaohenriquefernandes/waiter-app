@@ -12,4 +12,5 @@ export const OkButton = styled.TouchableOpacity`
   padding: 14px 24px;
   background: #FFFFFF;
   border-radius: 48px;
+  color: #D73035;
 `;

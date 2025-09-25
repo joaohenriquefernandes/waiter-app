@@ -23,7 +23,7 @@ export function OrderConfirmedModal({ visible, onOk }: IOrderConfirmedModalProps
           O pedido já entrou na fila de produção!
         </Text>
         <OkButton onPress={onOk}>
-          <Text color='#FFFFFF' weight='600'>OK</Text>
+          <Text color='#D73025' weight='600'>OK</Text>
         </OkButton>
       </Container>
     </Modal>
