@@ -7,10 +7,20 @@ import { useEffect } from 'react';
 interface IOrderModalProps {
   visible: boolean;
   order: IOrder | null
+  isLoading: boolean;
   onClose: () => void;
+  onCancelOrder: () => void
+  onChangeOrderStatus: () => void;
 }
 
-export function OrderModal({ visible, order, onClose }: IOrderModalProps) {
+export function OrderModal({
+    visible,
+    order,
+    isLoading,
+    onClose,
+    onCancelOrder,
+    onChangeOrderStatus
+  }: IOrderModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if(event.key === 'Escape') onClose();
@@ -79,11 +89,29 @@ export function OrderModal({ visible, order, onClose }: IOrderModalProps) {
           </Total>
         </OrderDetails>
         <Actions>
-          <button type='button' className='primary'>
-            <span>👨‍🍳</span>
-            <strong>Iniciar Produção</strong>
-          </button>
-          <button type='button' className='secondary'>
+          {order.status !== 'DONE' && (
+            <button
+              type='button'
+              className='primary'
+              disabled={isLoading}
+              onClick={onChangeOrderStatus}
+            >
+              <span>
+                {order.status === 'WAITING' && '👨‍🍳'}
+                {order.status === 'IN_PRODUCTION' && '✅'}
+              </span>
+              <strong>
+                {order.status === 'WAITING' && 'Iniciar Produção'}
+                {order.status === 'IN_PRODUCTION' && 'Concluir Pedido'}
+              </strong>
+            </button>
+          )}
+          <button
+            type='button'
+            className='secondary'
+            disabled={isLoading}
+            onClick={onCancelOrder}
+          >
             Cancelar Pedido
           </button>
         </Actions>
